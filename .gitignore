@@ -70,3 +70,9 @@ logs/
 
 # Files built by Resharper
 _ReSharper*/
+
+# Ignore all JSON files
+*.json
+
+# Ignore all folders with .vs in their name
+**/.vs*/
