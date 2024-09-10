@@ -7,10 +7,9 @@ namespace PoopyPoApi.Data
     {
         public PoopyDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
-            
         }
 
         public DbSet<PoopLocations> PoopLocations { get; set; }
-        public DbSet<Users> Users { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

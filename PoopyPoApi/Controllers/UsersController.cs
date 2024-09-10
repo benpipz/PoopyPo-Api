@@ -31,10 +31,10 @@ namespace PoopyPoApi.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{uid}")]
-        public async Task<IActionResult> IsUserExists([FromRoute]string uid)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> IsUserExists([FromRoute] string id)
         {
-            var user = await _poopyDbContext.Users.FirstOrDefaultAsync(x => x.Uid == uid);
+            var user = await _poopyDbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
 
             if (user is null)
             {
@@ -48,19 +48,17 @@ namespace PoopyPoApi.Controllers
         public IActionResult AddUser([FromBody] SignUpUsersDto singUpUserDto)
         {
             UsersDto userDto = new UsersDto();
-            if (userDto is not null)
-            {
-                Users user = new Users();
-                user.SignupDate = DateOnly.FromDateTime(DateTime.Now);
-                user.PrivateName = singUpUserDto.Name;
-                user.FamilyName = singUpUserDto.Name;
-                user.Email = singUpUserDto.Email;
-                user.PoopyScore = 0;
-                user.Uid = singUpUserDto.Uid;
 
-                _poopyDbContext.Users.Add(user);
-                _poopyDbContext.SaveChanges();
-            }
+            User user = new User();
+            user.SignupDate = DateOnly.FromDateTime(DateTime.Now);
+            user.PrivateName = singUpUserDto.Name;
+            user.FamilyName = singUpUserDto.Name;
+            user.Email = singUpUserDto.Email;
+            user.PoopyScore = 0;
+            user.Id = singUpUserDto.Id;
+
+            _poopyDbContext.Users.Add(user);
+            _poopyDbContext.SaveChanges();
 
             return Ok();
         }

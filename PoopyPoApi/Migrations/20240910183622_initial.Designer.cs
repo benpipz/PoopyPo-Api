@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PoopyPoApi.Data;
 
@@ -11,9 +12,11 @@ using PoopyPoApi.Data;
 namespace PoopyPoApi.Migrations
 {
     [DbContext(typeof(PoopyDbContext))]
-    partial class PoopyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240910183622_initial")]
+    partial class initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
