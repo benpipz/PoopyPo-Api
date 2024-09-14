@@ -22,7 +22,7 @@ namespace PoopyPoApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("PoopyPoApi.Models.Domain.PoopLocations", b =>
+            modelBuilder.Entity("PoopyPoApi.Models.Domain.PoopLocation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,16 +59,12 @@ namespace PoopyPoApi.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("FamilyName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("PoopyScore")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("PrivateName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly>("SignupDate")
                         .HasColumnType("date");
@@ -78,7 +74,7 @@ namespace PoopyPoApi.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("PoopyPoApi.Models.Domain.PoopLocations", b =>
+            modelBuilder.Entity("PoopyPoApi.Models.Domain.PoopLocation", b =>
                 {
                     b.HasOne("PoopyPoApi.Models.Domain.User", "User")
                         .WithMany()

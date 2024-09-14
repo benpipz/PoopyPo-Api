@@ -25,7 +25,7 @@ namespace PoopyPoApi.Controllers
 
             if (users.Count == 0)
             {
-                return StatusCode(204);
+                return NoContent();
             }
 
             return Ok(users);
@@ -45,14 +45,13 @@ namespace PoopyPoApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddUser([FromBody] SignUpUsersDto singUpUserDto)
+        public IActionResult AddUser([FromBody] UserDto singUpUserDto)
         {
-            UsersDto userDto = new UsersDto();
+            UserDto userDto = new UserDto();
 
             User user = new User();
             user.SignupDate = DateOnly.FromDateTime(DateTime.Now);
-            user.PrivateName = singUpUserDto.Name;
-            user.FamilyName = singUpUserDto.Name;
+            user.Name = singUpUserDto.Name;
             user.Email = singUpUserDto.Email;
             user.PoopyScore = 0;
             user.Id = singUpUserDto.Id;

@@ -9,7 +9,7 @@ namespace PoopyPoApi.Data
         {
         }
 
-        public DbSet<PoopLocations> PoopLocations { get; set; }
+        public DbSet<PoopLocation> PoopLocations { get; set; }
         public DbSet<User> Users { get; set; }
     }
 }

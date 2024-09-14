@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PoopyPoApi.Data;
 using PoopyPoApi.Models.Domain;
 using PoopyPoApi.Models.Dto;
@@ -20,30 +21,29 @@ namespace PoopyPoApi.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            //var locations = _poopyDbContext.PoopLocations.ToList();
+            var locations = _poopyDbContext.PoopLocations.Include(o => o.User).ToList();
 
-            //var locationDto = new List<LocationDto>();
-            //foreach (var location in locations)
-            //{
-            //    locationDto.Add(new LocationDto
-            //    {
-            //        Id = location.Id,
-            //        Latitude = location.Latitude,
-            //        Longitude = location.Longitude,
-            //        Votes = location.Votes,
-            //        PoopDate = location.PoopDate,
-            //        //UserId = location.UserId,
-            //        //User = location.User
-            //    });
-            //}
+            var locationDto = new List<LocationDto>();
+            foreach (var location in locations)
+            {
+                locationDto.Add(new LocationDto
+                {
+                    Id = location.Id,
+                    Latitude = location.Latitude,
+                    Longitude = location.Longitude,
+                    Votes = location.Votes,
+                    PoopDate = location.PoopDate,
+                    UserId = location.UserId,
+                    User = location.User
+                });
+            }
 
-            //if (locationDto.Count == 0)
-            //{
-            //    return NoContent();
-            //}
+            if (locationDto.Count == 0)
+            {
+                return NoContent();
+            }
 
-            //return Ok(locationDto);
-            return Ok();
+            return Ok(locationDto);
         }
 
 
@@ -51,84 +51,75 @@ namespace PoopyPoApi.Controllers
         [Route("{id:Guid}")]
         public IActionResult GetById([FromRoute]Guid id)
         {
-            //var location = _poopyDbContext.PoopLocations.FirstOrDefault(x => x.Id == id);
+            var location = _poopyDbContext.PoopLocations.FirstOrDefault(x => x.Id == id);
 
-            //if (location == null)
-            //{
-            //    return NoContent();
-            //};
+            if (location == null)
+            {
+                return NoContent();
+            };
 
-            //var locationDto = new LocationDto
-            //{
-            //    Id = location.Id,
-            //    Latitude = location.Latitude,
-            //    Longitude = location.Longitude,
-            //    Votes = location.Votes,
-            //    PoopDate = location.PoopDate,
-            //    //UserId = location.UserId,
-            //    //User = location.User
-            //};
+            var locationDto = new LocationDto
+            {
+                Id = location.Id,
+                Latitude = location.Latitude,
+                Longitude = location.Longitude,
+                Votes = location.Votes,
+                PoopDate = location.PoopDate,
+                User = location.User
+            };
 
-            //return Ok(locationDto);
-            return Ok();
+            return Ok(locationDto);
         }
 
         [HttpPost]
         public IActionResult Create([FromBody] LocationDto locationDto)
         {
-            //Users user = _poopyDbContext.Users.FirstOrDefault(x => x.Uid == locationDto.Uid);
-            //var location = new PoopLocations
-            //{
-            //    Id = new Guid(),
-            //    Latitude = locationDto.Latitude,
-            //    Longitude = locationDto.Longitude,
-            //    Votes = 0,
-            //    PoopDate = DateOnly.FromDateTime(DateTime.Now),
-            //    UserId = user.Id,
-            //};
+            User user = _poopyDbContext.Users.FirstOrDefault(x => x.Id == locationDto.UserId);
+            if(user is null)
+            {
+                return BadRequest();
+            }
+            if (_poopyDbContext.PoopLocations.Any(x => x.Latitude == locationDto.Latitude && x.Longitude == locationDto.Longitude))
+            { 
+                return NoContent();
+            }
 
-            //_poopyDbContext.PoopLocations.Add(location);
-            //_poopyDbContext.SaveChanges();
+            var location = new PoopLocation
+            {
+                Id = new Guid(),
+                Latitude = locationDto.Latitude,
+                Longitude = locationDto.Longitude,
+                Votes = 0,
+                PoopDate = DateOnly.FromDateTime(DateTime.Now),
+                UserId = user.Id,
+                User = user
+            };
 
-            //var locationDtoResponse = new LocationDto
-            //{
-            //    Id = location.Id,
-            //    Latitude = location.Latitude,
-            //    Longitude = location.Longitude,
-            //    Votes = location.Votes,
-            //    PoopDate = location.PoopDate,
-            //    //UserId = location.UserId,
-            //    //User = location.User
-            //};
+            _poopyDbContext.PoopLocations.Add(location);
+            _poopyDbContext.SaveChanges();
 
-            return Ok();
-            //return CreatedAtAction(nameof(GetById), new { id = locationDtoResponse.Id }, locationDtoResponse);
+            var locationDtoResponse = new LocationDto
+            {
+                Id = location.Id,
+                Latitude = location.Latitude,
+                Longitude = location.Longitude,
+                Votes = location.Votes,
+                PoopDate = location.PoopDate,
+                UserId = location.UserId,
+                User = location.User
+                };
+
+            return CreatedAtAction(nameof(GetById), new { id = locationDtoResponse.Id }, locationDtoResponse);
         }
 
-        
-        //[HttpGet]
-        //public IActionResult GetAllLocations()
-        //{
-        //    var location = new List<LocationDto>();
+        [HttpDelete]
+        public IActionResult Delete()
+        {
+            _poopyDbContext.PoopLocations.ToList();
+            _poopyDbContext.PoopLocations.RemoveRange(_poopyDbContext.PoopLocations);
+           _poopyDbContext.SaveChanges();
+            return Ok();
+        }
 
-        //    location.Add(new LocationDto()
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        Latitude = 32.0853,
-        //        Longitude = 34.7818,
-        //        Votes = 0,
-        //        PoopDate = new DateOnly(2022, 7, 6),
-        //        UserId = Guid.NewGuid(),
-        //        User = new Users()
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            PrivateName = "John",
-        //            FamilyName = "Doe",
-        //            Email = ""
-        //        }
-        //    });
-
-        //    return Ok();
-        //}
     }
 }

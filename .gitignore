@@ -76,3 +76,6 @@ _ReSharper*/
 
 # Ignore all folders with .vs in their name
 **/.vs*/
+
+migrations/
+
