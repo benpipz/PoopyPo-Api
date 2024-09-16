@@ -121,5 +121,22 @@ namespace PoopyPoApi.Controllers
             return Ok();
         }
 
+        [HttpPut]
+        [Route("{id:Guid}/{score:int}")]
+        public IActionResult UpdateVote([FromRoute]Guid id,[FromRoute] int score)
+        {
+            var location = _poopyDbContext.PoopLocations.FirstOrDefault(x => x.Id == id);
+
+            if (location == null)
+            {
+                return NoContent();
+            };
+
+            location.Votes = score;
+            _poopyDbContext.SaveChanges();
+
+            return Ok(location);
+        }
+    
     }
 }
