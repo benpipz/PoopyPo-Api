@@ -122,21 +122,67 @@ namespace PoopyPoApi.Controllers
         }
 
         [HttpPut]
-        [Route("{id:Guid}/{score:int}")]
-        public IActionResult UpdateVote([FromRoute]Guid id,[FromRoute] int score)
+        [Route("{id:Guid}")]
+        public IActionResult UpdateVote([FromRoute]Guid id, [FromBody] PoopInteraction interaction)
         {
             var location = _poopyDbContext.PoopLocations.FirstOrDefault(x => x.Id == id);
+            if(location is null)
+            {
+                return NoContent();
+            }
+
+            var interactionOnPoop = _poopyDbContext.PoopInteractions.FirstOrDefault(x => x.PoopLocation.Id == id && x.User.Id == interaction.UserId);
+            if (interactionOnPoop != null)
+            {
+                if(interactionOnPoop.InteractionType == interaction.Interaction)
+                {
+                    return NoContent();
+                }
+                interactionOnPoop.InteractionType = interaction.Interaction;
+            }
+            else
+            {
+                PoopInteractions poopInteraction = new PoopInteractions
+                {
+                    Id = new Guid(),
+                    InteractionType = interaction.Interaction,
+                    PoopLocation = location,
+                    User = _poopyDbContext.Users.FirstOrDefault(x => x.Id == interaction.UserId)
+                };
+                _poopyDbContext.PoopInteractions.Add(poopInteraction);
+            }
 
             if (location == null)
             {
                 return NoContent();
             };
-
-            location.Votes = score;
+            switch (interaction.Interaction)
+            {
+                case InteractionType.Upvote:
+                    location.Votes++;
+                    break;
+                case InteractionType.Downvote:
+                    location.Votes--;
+                    break;
+                default:
+                    break;
+            }
             _poopyDbContext.SaveChanges();
 
             return Ok(location);
         }
-    
+
+        [HttpGet]
+        [Route("{id:Guid}/{userId}")]
+        public IActionResult GetLastActionOnPoop([FromRoute]Guid id, [FromRoute]string userId)
+        {
+            var poopInteraction = _poopyDbContext.PoopInteractions.FirstOrDefault(x => x.User.Id == userId && x.PoopLocation.Id == id);
+            if (poopInteraction is null)
+            {
+                return NoContent();
+            }
+            return Ok(poopInteraction.InteractionType);
+        }
+
     }
 }

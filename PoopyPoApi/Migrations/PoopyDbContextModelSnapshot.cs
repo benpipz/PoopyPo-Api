@@ -22,6 +22,30 @@ namespace PoopyPoApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("PoopyPoApi.Models.Domain.PoopInteractions", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("InteractionType")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("PoopLocationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PoopLocationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PoopInteractions");
+                });
+
             modelBuilder.Entity("PoopyPoApi.Models.Domain.PoopLocation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -72,6 +96,23 @@ namespace PoopyPoApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("PoopyPoApi.Models.Domain.PoopInteractions", b =>
+                {
+                    b.HasOne("PoopyPoApi.Models.Domain.PoopLocation", "PoopLocation")
+                        .WithMany()
+                        .HasForeignKey("PoopLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PoopyPoApi.Models.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("PoopLocation");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("PoopyPoApi.Models.Domain.PoopLocation", b =>

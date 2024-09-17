@@ -11,5 +11,6 @@ namespace PoopyPoApi.Data
 
         public DbSet<PoopLocation> PoopLocations { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<PoopInteractions> PoopInteractions { get; set; }
     }
 }
