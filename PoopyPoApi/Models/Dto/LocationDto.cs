@@ -11,5 +11,9 @@ namespace PoopyPoApi.Models.Dto
         public string UserId { get; set; }
         public DateOnly? PoopDate { get; set; }
         public User? User { get; set; }
+        public string? Image { get; set; }
+        public bool? Anonymous { get; set; }
+        public string? Description { get; set; }
+
     }
 }

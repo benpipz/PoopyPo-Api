@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using PoopyPoApi.Data;
 using PoopyPoApi.Models.Domain;
 using PoopyPoApi.Models.Dto;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PoopyPoApi.Controllers
 {
@@ -26,7 +27,7 @@ namespace PoopyPoApi.Controllers
             var locationDto = new List<LocationDto>();
             foreach (var location in locations)
             {
-                locationDto.Add(new LocationDto
+                var dto = new LocationDto
                 {
                     Id = location.Id,
                     Latitude = location.Latitude,
@@ -34,8 +35,16 @@ namespace PoopyPoApi.Controllers
                     Votes = location.Votes,
                     PoopDate = location.PoopDate,
                     UserId = location.UserId,
-                    User = location.User
-                });
+                    User = location.User,
+                    Anonymous = location.Anonymous,
+                    Description = location.Description,
+                };
+                if(location.Image is not null)
+                {
+                    dto.Image = Convert.ToBase64String(location.Image);
+                }
+
+                locationDto.Add(dto);
             }
 
             if (locationDto.Count == 0)
@@ -92,7 +101,10 @@ namespace PoopyPoApi.Controllers
                 Votes = 0,
                 PoopDate = DateOnly.FromDateTime(DateTime.Now),
                 UserId = user.Id,
-                User = user
+                User = user,
+                Anonymous = locationDto.Anonymous,
+                Description = locationDto.Description,
+                Image = locationDto.Image is not null ? Convert.FromBase64String(locationDto.Image) : null
             };
 
             _poopyDbContext.PoopLocations.Add(location);
@@ -106,8 +118,11 @@ namespace PoopyPoApi.Controllers
                 Votes = location.Votes,
                 PoopDate = location.PoopDate,
                 UserId = location.UserId,
-                User = location.User
-                };
+                User = location.User,
+                Anonymous = locationDto.Anonymous,
+                Description = locationDto.Description,
+                Image = locationDto.Image is not null ? Convert.ToBase64String(location.Image): null
+            };
 
             return CreatedAtAction(nameof(GetById), new { id = locationDtoResponse.Id }, locationDtoResponse);
         }
@@ -115,8 +130,8 @@ namespace PoopyPoApi.Controllers
         [HttpDelete]
         public IActionResult Delete()
         {
-            _poopyDbContext.PoopLocations.ToList();
-            _poopyDbContext.PoopLocations.RemoveRange(_poopyDbContext.PoopLocations);
+           var allEntities =  _poopyDbContext.PoopLocations.ToList();
+            _poopyDbContext.PoopLocations.RemoveRange(allEntities);
            _poopyDbContext.SaveChanges();
             return Ok();
         }
